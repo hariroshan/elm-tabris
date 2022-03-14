@@ -42,6 +42,7 @@ export const initHandlers = (CustomEvent, events, object) =>
     events.reduce((klass, evt) => {
         const key = "on" + capitalize(evt)
         klass[key] = ((e) => {
+            console.log("event", key)
             klass.dispatchEvent(new CustomEvent(evt, { dataEvent: e }))
         })
         klass.handlers = Object.assign(klass.handlers || {}, { [key]: klass[key] })

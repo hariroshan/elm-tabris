@@ -25,7 +25,7 @@ toAttribute attr =
             attribute "idletimeoutenabled" (fromBool bool)
 
         OnBackNavigation decoder ->
-            on "backNavigation" decoder
+            on "backnavigation" decoder
 
         OnBackground decoder ->
             on "background" decoder
@@ -34,7 +34,7 @@ toAttribute attr =
             on "foreground" decoder
 
         OnKeyPress decoder ->
-            on "keyPress" decoder
+            on "keypress" decoder
 
         OnPause decoder ->
             on "pause" decoder

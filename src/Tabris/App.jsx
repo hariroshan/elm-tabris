@@ -19,6 +19,7 @@ const App = {
     return view
   },
 }
+const getParsedProps = (props) => Object.keys(props).reduce((acc, cur) => Object.assign(acc, {[cur]: JSON.parse(props[cur])}), {})
 
 App.asElement = (UIElement, {CustomEvent}) =>
   class AppElement extends UIElement {
@@ -26,12 +27,15 @@ App.asElement = (UIElement, {CustomEvent}) =>
       return App.attributeNames
     }
     init = props => {
-        const mappedProps = Object.keys(props).reduce((acc, cur) => Object.assign(acc, {[cur]: JSON.parse(props[cur])}), {})
+        const mappedProps = getParsedProps(props)
         initHandlers(CustomEvent, events, this)
-        Object.assign(app, mappedProps, this.handlers)
+        Object.assign(app, mappedProps)
+        Object.keys(this.handlers).forEach(key => {
+          app[key](this.handlers[key])
+        })
     }
     update = (props, view) => {
-        const mappedProps = Object.keys(props).reduce((acc, cur) => Object.assign(acc, {[cur]: JSON.parse(props[cur])}), {})
+      const mappedProps = getParsedProps(props)
         Object.assign(app, mappedProps)
         return view
     }
