@@ -1,26 +1,53 @@
 module Tabris exposing (..)
 
-import Tabris.TextView as TextView
+import Html exposing (Html)
+import Json.Decode as D exposing (Decoder)
+import Tabris.App as App
 import Tabris.Button as Button
 import Tabris.Stack as Stack
-import Tabris.App as App
-import Html exposing (Html)
+import Tabris.TextView as TextView
 
-type alias Node msg = Html msg
+
+type alias Node msg =
+    Html msg
+
+
+type Incoming
+    = AppProps App.Props
+    | AppMethod App.Method
 
 
 textView : List (TextView.Attribute msg) -> List (Node msg) -> Node msg
-textView = TextView.view
+textView =
+    TextView.view
 
 
 button : List (Button.Attribute msg) -> Node msg
-button = Button.view
+button =
+    Button.view
 
 
 stack : List (Stack.Attribute msg) -> List (Node msg) -> Node msg
-stack = Stack.view
+stack =
+    Stack.view
 
 
 app : List (App.Attribute msg) -> List (Node msg) -> Node msg
-app = App.view
+app =
+    App.view
 
+
+decodeIncoming : Decoder Incoming
+decodeIncoming =
+    D.andThen
+        (\id ->
+            if App.tagName == id then
+                D.oneOf
+                    [ App.decodeProps |> D.map AppProps
+                    , App.decodeMethods |> D.map AppMethod
+                    ]
+
+            else
+                D.fail "Unknown body"
+        )
+        (D.field "x-id" D.string)

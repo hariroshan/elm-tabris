@@ -1,7 +1,6 @@
 import  {app, Composite, contentView as rootView } from "tabris"
-
-
 import  { attrsToProps, initHandlers, propNamesToAttrNames, toAttrNameMap } from './Common'
+
 const events = [
   "backNavigation",
   "background",
@@ -44,7 +43,8 @@ App.asElement = (UIElement, {CustomEvent}) =>
   }
 
 App.tagName = 'x-app'
-
+App.readPropValue = prop => app[prop]
+App.methodCall = (method, args) => app[method](...args)
 App.propNames = ["idleTimeoutEnabled"]
 App.attributeNames = propNamesToAttrNames(App.propNames)
 App.attributeNameMap = toAttrNameMap(App.attributeNames, App.propNames)

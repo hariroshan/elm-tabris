@@ -4,6 +4,7 @@ import Browser
 import Html.Lazy exposing (lazy, lazy2)
 import Json.Decode as D
 import Tabris as TB
+import Tabris.Port as Port
 import Tabris.App as App
 import Tabris.Button as Button
 import Tabris.TextView as TextView
@@ -19,6 +20,7 @@ type Msg
     | Dec
     | Paused
     | Resumed
+    | IncomingValue D.Value
 
 
 init : () -> ( Model, Cmd Msg )
@@ -29,12 +31,17 @@ init _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        IncomingValue value -> 
+            let 
+                _ = D.decodeValue TB.decodeIncoming value |> Debug.log "Incoming" -- >> Result.map IncomingValue >> Result. NoOp
+            in
+            (model, Cmd.none)
         Paused -> 
             ({model | states = "Paused" :: model.states}, Cmd.none)
         Resumed -> 
             ({model | states = "Resumed" :: model.states}, Cmd.none)
         Inc ->
-            ( { model | count = model.count + 1 }, Cmd.none )
+            ( { model | count = model.count + 1 }, Port.methodCall (App.methodShare [App.Title "Logo" ]) ) -- "https://google.co.in" App.Files ["sample.png"]
 
         Dec ->
             ( { model | count = model.count - 1 }, Cmd.none )
@@ -52,12 +59,14 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.batch [
+        Port.incoming (IncomingValue)
+    ]
 
 
 view : Model -> TB.Node Msg
 view model =
-    TB.app [ App.IdleTimeoutEnabled True, App.OnPause (D.succeed Paused), App.OnResume (D.succeed Resumed) ]
+    TB.app [ App.OnBackNavigation (D.succeed Paused)]
         [ TB.stack []
             [ lazy2 TB.textView [ TextView.Text (String.fromInt model.count), TextView.Widget (Widget.PaddingXY 20 5) ] []
             , lazy TB.button [ Button.Text "Inc", Button.OnSelect (D.succeed Inc) ]

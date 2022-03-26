@@ -15,6 +15,111 @@ import {
     withUnmount,
 } from './mixins'
 
+const handleReadParam = (params, incoming) => {
+    const readId = params[0]
+    const readProp = params[1]
+    Object.values(allElements).forEach(mod => {
+        if (mod.tagName === readId && mod.readPropValue !== undefined && incoming !== undefined) {
+            const newData = {
+                "x-id": mod.tagName,
+                [readProp]: mod.readPropValue(readProp)
+            }
+            incoming.send(newData)
+            // console.log(mod.tagName, newData)
+        }
+    })
+}
+
+const result = {
+    ok(val) {
+        return { ok: val }
+    },
+    error(error) {
+        return { err: error }
+    }
+}
+
+async function makeFileObj(path) {
+    const blob = await (await fetch(path)).blob();
+    const fileName = path.substring(path.lastIndexOf('/') + 1);
+    // eslint-disable-next-line no-undef
+    return new File([blob], fileName, { type: blob.type });
+}
+
+async function modifyFileTypeArgs(value) {
+    if (value.type !== undefined && value.type === "file") {
+        if (value.value instanceof Array) {
+            const files = await Promise.all(value.value.map(makeFileObj))
+            return files
+        } else {
+            return await makeFileObj(value.value)
+        }
+    }
+    if (value instanceof Array) {
+        return await Promise.all(value.map(modifyFileTypeArgs))
+    } else if (value instanceof Object) {
+        return Object.keys(value).reduce(async (acc, key) => {
+            const result = await modifyFileTypeArgs(value[key])
+            if (result.length === undefined || result.length > 0) {
+                return acc.then(v => {
+                    v[key] = result
+                    return v
+                })
+            }
+            return acc
+        }, Promise.resolve({})).catch(console.error)
+    } else {
+        return (value)
+    }
+}
+
+const methodCast = async params => {
+    const readId = params[0]
+    const readMethod = params[1]
+    const readArg = await modifyFileTypeArgs(params[2])
+    Object.values(allElements).forEach(mod => {
+        if (mod.tagName === readId && mod.methodCall !== undefined) {
+            console.log(readArg)
+            mod.methodCall(readMethod, readArg)
+            // console.log(mod.tagName, newData)
+        }
+    })
+}
+const methodCall = async (params, incoming) => {
+    const readId = params[0]
+    const readMethod = params[1]
+    const readArg = await modifyFileTypeArgs(params[2])
+    Object.values(allElements).forEach(mod => {
+        if (mod.tagName === readId && mod.methodCall !== undefined && incoming !== undefined) {
+            const returned = mod.methodCall(readMethod, readArg)
+            if (returned instanceof Promise) {
+                returned.then(e => {
+                    const newData = {
+                        "x-id": mod.tagName,
+                        [readMethod]: result.ok(e === undefined ? null : e)
+                    }
+                    incoming.send(newData)
+                    console.log(mod.tagName, newData)
+                    return e
+                }).catch(e => {
+                    const newData = {
+                        "x-id": mod.tagName,
+                        [readMethod]: result.error(e === undefined ? null : e)
+                    }
+                    incoming.send(newData)
+                    console.error(e)
+                })
+            } else {
+                const newData = {
+                    "x-id": mod.tagName,
+                    [readMethod]: returned === undefined ? null : returned
+                }
+                incoming.send(newData)
+            }
+        }
+    })
+}
+
 
 const initElements = params => {
     const { app, window } = params
@@ -84,6 +189,9 @@ function init() {
         app,
         window,
         initElements,
+        handleReadParam,
+        methodCast,
+        methodCall
     }
 
 
@@ -128,9 +236,24 @@ function init() {
     */
 
     const elmInitScript = `
-      Elm().Main.init({
+      const el = Elm().Main.init({
         node: window.document.getElementById('root')
       })
+      if (el.ports.read !== undefined) {
+        el.ports.read.subscribe(param => {
+            handleReadParam(param, el.ports.incoming)
+        })
+      }
+      if (el.ports.methodCast !== undefined) {
+        el.ports.methodCast.subscribe(param => {
+            methodCast(param)
+        })
+      }
+      if (el.ports.methodCall !== undefined) {
+        el.ports.methodCall.subscribe(param => {
+            methodCall(param, el.ports.incoming)
+        })
+      }
     `
 
 
