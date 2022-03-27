@@ -9,6 +9,7 @@ port read : ( String, String ) -> Cmd msg
 
 port incoming : (D.Value -> msg) -> Sub msg
 
+port eventOccured : (D.Value -> msg) -> Sub msg
 
 port methodCast :
     ( String, String, Array D.Value )
@@ -18,3 +19,5 @@ port methodCast :
 port methodCall :
     ( String, String, Array D.Value )
     -> Cmd msg -- Value of method call is push through incoming port
+
+port eventListener : ( String, String ) -> Cmd msg

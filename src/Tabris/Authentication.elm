@@ -1,9 +1,22 @@
-module Tabris.Authentication exposing (..)
+module Tabris.Authentication exposing
+    ( AuthOptions(..)
+    , Method(..)
+    , Props(..)
+    , Status(..)
+    , SupportedBiometrics(..)
+    , decodeMethods
+    , decodeProps
+    , methodAuthenticate
+    , methodCanAuthenticate
+    , methodCancel
+    , readAvailableBiometrics, tagName
+    )
 
 import Array exposing (Array)
 import Json.Decode as D
 import Json.Encode as E
 import Tabris.Common exposing (decodeResult)
+
 
 type SupportedBiometrics
     = FingerPrint
@@ -120,9 +133,10 @@ cancel : String
 cancel =
     "cancel"
 
-methodCancel : (String, String, Array E.Value)
-methodCancel = 
-    (tagName, cancel, Array.empty)
+
+methodCancel : ( String, String, Array E.Value )
+methodCancel =
+    ( tagName, cancel, Array.empty )
 
 
 readAvailableBiometrics : ( String, String )

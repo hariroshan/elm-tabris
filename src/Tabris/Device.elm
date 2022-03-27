@@ -1,4 +1,20 @@
-module Tabris.Device exposing (..)
+module Tabris.Device exposing
+    ( CameraProps
+    , Event(..)
+    , Orientation(..)
+    , Platform(..)
+    , Props(..)
+    , decodeEvent
+    , eventOrientationChanged
+    , tagName
+    )
+
+import Json.Decode as D
+
+
+tagName : String
+tagName =
+    "m-device"
 
 
 type alias CameraProps =
@@ -10,18 +26,74 @@ type alias CameraProps =
     }
 
 
+type Orientation
+    = PortraitPrimary
+    | PortraitSecondary
+    | LandscapePrimary
+    | LandscapeSecondary
+
+
+decodeOrientation : D.Decoder Orientation
+decodeOrientation =
+    D.string
+        |> D.andThen
+            (\str ->
+                case str of
+                    "portrait-primary" ->
+                        D.succeed PortraitPrimary
+
+                    "portrait-secondary" ->
+                        D.succeed PortraitSecondary
+
+                    "landscape-primary" ->
+                        D.succeed LandscapePrimary
+
+                    "landscape-secondary" ->
+                        D.succeed LandscapeSecondary
+
+                    _ ->
+                        D.fail ("unknown orientation " ++ str)
+            )
+
+
+type Platform
+    = Andriod
+    | IOS
+
+
 type Props
     = Cameras (List CameraProps)
-    | Language
-    | Model
-    | Name
-    | Orientation
-    | Platform
-    | ScaleFactor
-    | ScreenHeight
-    | ScreenWidth
-    | Vendor
-    | Version
+    | Language String
+    | Model String
+    | Name String
+    | Orientation Orientation
+    | Platform Platform
+    | ScaleFactor Float
+    | ScreenHeight Int
+    | ScreenWidth Int
+    | Vendor String
+    | Version String
+
+
+type Event
+    = OrientationChanged Orientation
+
+
+onOrientationChanged : String
+onOrientationChanged =
+    "onOrientationChanged"
+
+
+eventOrientationChanged : ( String, String )
+eventOrientationChanged =
+    ( tagName, onOrientationChanged )
+
+
+decodeEvent : D.Decoder Event
+decodeEvent =
+    D.oneOf
+        [ D.field onOrientationChanged (D.field "value" decodeOrientation) |> D.map OrientationChanged
+        ]
 
 
 cameras : String

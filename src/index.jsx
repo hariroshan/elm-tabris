@@ -17,12 +17,14 @@ import {
 } from './mixins'
 import Blob from '../node_modules/happy-dom/lib/file/Blob';
 
+const allModsValue = Object.values(allMods)
+const allElementsValue = Object.values(allElements)
 
 function getModules(id) {
     if (id.startsWith("m")) {
-        return Object.values(allMods)
+        return allModsValue
     } else {
-        return Object.values(allElements)
+        return allElementsValue
     }
 }
 
@@ -135,6 +137,19 @@ const methodCall = async (params, incoming) => {
     })
 }
 
+const eventListener = (params, incoming) => {
+    const readId = params[0]
+    const readMethod = params[1]
+    getModules(readId).forEach(mod => {
+        if (mod.tagName === readId && mod.eventCallback !== undefined) {
+            const callback = ev => incoming.send({
+                "x-id": mod.tagName,
+                [readMethod]: ev === undefined ? null : ev
+            })
+            mod.eventCallback(readMethod, callback)
+        }
+    })
+}
 
 const initElements = params => {
     const { app, window } = params
@@ -206,7 +221,8 @@ function init() {
         initElements,
         handleReadParam,
         methodCast,
-        methodCall
+        methodCall,
+        eventListener
     }
 
 
@@ -267,6 +283,11 @@ function init() {
       if (el.ports.methodCall !== undefined) {
         el.ports.methodCall.subscribe(param => {
             methodCall(param, el.ports.incoming)
+        })
+      }
+      if (el.ports.eventListener !== undefined) {
+        el.ports.eventListener.subscribe(param => {
+            eventListener(param, el.ports.eventOccured)
         })
       }
     `
