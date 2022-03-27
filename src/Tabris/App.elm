@@ -2,16 +2,18 @@ module Tabris.App exposing
     ( Attribute(..)
     , Method
     , Props
+    , ShareData(..)
     , decodeMethods
     , decodeProps
     , methodGetResourceLocation
     , methodLaunchUrl
     , methodRegisterFont
     , methodReload
+    , methodShare
     , readId
     , readIdleTimeoutEnabled
     , tagName
-    , view, methodShare, ShareData(..)
+    , view
     )
 
 import Array exposing (Array)
@@ -20,7 +22,7 @@ import Html.Attributes exposing (attribute)
 import Html.Events exposing (on)
 import Json.Decode as D exposing (Decoder)
 import Json.Encode as E
-import Tabris.Common exposing (fromBool)
+import Tabris.Common exposing (decodeResult, fromBool, makeFileType)
 
 
 type Method
@@ -127,7 +129,7 @@ methodReload url =
     , reload
     , url
         |> Maybe.map (E.string >> List.singleton >> Array.fromList)
-        |> Maybe.withDefault ([] |> Array.fromList)
+        |> Maybe.withDefault Array.empty
     )
 
 
@@ -150,10 +152,7 @@ methodShare shareList =
 
                     Files filepaths ->
                         ( "files"
-                        , E.object
-                            [ ( "type", E.string "file" )
-                            , ( "value", E.list E.string filepaths )
-                            ]
+                        , makeFileType (E.list E.string filepaths)
                         )
             )
         |> E.object
@@ -175,14 +174,6 @@ decodeProps =
         , D.field debugBuild D.bool |> D.map DebugBuildProp
         , D.field version D.string |> D.map Version
         , D.field versionCode D.float |> D.map VersionCode
-        ]
-
-
-decodeResult : { ok : Decoder value, err : Decoder error } -> Decoder (Result error value)
-decodeResult { ok, err } =
-    D.oneOf
-        [ D.field "ok" ok |> D.map Ok
-        , D.field "err" err |> D.map Err
         ]
 
 

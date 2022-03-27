@@ -15,6 +15,7 @@ import {
     withMountAndRender,
     withUnmount,
 } from './mixins'
+import Blob from '../node_modules/happy-dom/lib/file/Blob';
 
 
 function getModules(id) {
@@ -54,6 +55,10 @@ async function makeFileObj(path) {
     const fileName = path.substring(path.lastIndexOf('/') + 1);
     // eslint-disable-next-line no-undef
     return new File([blob], fileName, { type: blob.type });
+}
+
+function makeBuffer(param) {
+    return (new Blob([param])).arrayBuffer()
 }
 
 async function modifyFileTypeArgs(value) {

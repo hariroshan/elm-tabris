@@ -6,6 +6,7 @@ import Json.Decode as D
 import Tabris as TB
 import Tabris.Port as Port
 import Tabris.App as App
+import Tabris.Authentication as Auth
 import Tabris.Button as Button
 import Tabris.TextView as TextView
 import Tabris.Widget as Widget
@@ -41,7 +42,7 @@ update msg model =
         Resumed -> 
             ({model | states = "Resumed" :: model.states}, Cmd.none)
         Inc ->
-            ( { model | count = model.count + 1 }, Port.methodCall (App.methodShare [App.Title "Logo" ]) ) -- "https://google.co.in" App.Files ["sample.png"]
+            ( { model | count = model.count + 1 }, Port.read (Auth.readAvailableBiometrics) ) -- "https://google.co.in" App.Files ["sample.png"]  Auth.Title "Check Payment", Auth.SubTitle "Make sure values are correct" 
 
         Dec ->
             ( { model | count = model.count - 1 }, Cmd.none )

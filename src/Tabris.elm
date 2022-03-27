@@ -16,7 +16,8 @@ type alias Node msg =
 type Incoming
     = AppProps App.Props
     | AppMethod App.Method
-    | Authentication Authentication.Props
+    | AuthenticationProps Authentication.Props
+    | AuthenticationMethod Authentication.Method
 
 
 textView : List (TextView.Attribute msg) -> List (Node msg) -> Node msg
@@ -48,9 +49,10 @@ decodeIncoming =
                     [ App.decodeProps |> D.map AppProps
                     , App.decodeMethods |> D.map AppMethod
                     ]
-            else if Authentication.name == id then
+            else if Authentication.tagName == id then
                 D.oneOf
-                    [ Authentication.decodeProps |> D.map Authentication
+                    [ Authentication.decodeProps |> D.map AuthenticationProps 
+                    , Authentication.decodeMethods |> D.map AuthenticationMethod
                     ]
 
             else
