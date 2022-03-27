@@ -3,6 +3,7 @@ module Tabris exposing (..)
 import Html exposing (Html)
 import Json.Decode as D exposing (Decoder)
 import Tabris.App as App
+import Tabris.Authentication as Authentication
 import Tabris.Button as Button
 import Tabris.Stack as Stack
 import Tabris.TextView as TextView
@@ -15,6 +16,7 @@ type alias Node msg =
 type Incoming
     = AppProps App.Props
     | AppMethod App.Method
+    | Authentication Authentication.Props
 
 
 textView : List (TextView.Attribute msg) -> List (Node msg) -> Node msg
@@ -45,6 +47,10 @@ decodeIncoming =
                 D.oneOf
                     [ App.decodeProps |> D.map AppProps
                     , App.decodeMethods |> D.map AppMethod
+                    ]
+            else if Authentication.name == id then
+                D.oneOf
+                    [ Authentication.decodeProps |> D.map Authentication
                     ]
 
             else

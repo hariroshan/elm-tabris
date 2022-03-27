@@ -5,6 +5,7 @@ const { runInContext } = require("vm-shim");
 
 import Elm from './Main.elm'
 import * as allElements from './Tabris'
+import * as allMods from './TabrisMods'
 
 import {
     withAttrs,
@@ -15,10 +16,19 @@ import {
     withUnmount,
 } from './mixins'
 
+
+function getModules(id) {
+    if (id.startsWith("m")) {
+        return Object.values(allMods)
+    } else {
+        return Object.values(allElements)
+    }
+}
+
 const handleReadParam = (params, incoming) => {
     const readId = params[0]
     const readProp = params[1]
-    Object.values(allElements).forEach(mod => {
+    getModules(readId).forEach(mod => {
         if (mod.tagName === readId && mod.readPropValue !== undefined && incoming !== undefined) {
             const newData = {
                 "x-id": mod.tagName,
@@ -77,7 +87,7 @@ const methodCast = async params => {
     const readId = params[0]
     const readMethod = params[1]
     const readArg = await modifyFileTypeArgs(params[2])
-    Object.values(allElements).forEach(mod => {
+    getModules(readId).forEach(mod => {
         if (mod.tagName === readId && mod.methodCall !== undefined) {
             console.log(readArg)
             mod.methodCall(readMethod, readArg)
@@ -89,7 +99,7 @@ const methodCall = async (params, incoming) => {
     const readId = params[0]
     const readMethod = params[1]
     const readArg = await modifyFileTypeArgs(params[2])
-    Object.values(allElements).forEach(mod => {
+    getModules(readId).forEach(mod => {
         if (mod.tagName === readId && mod.methodCall !== undefined && incoming !== undefined) {
             const returned = mod.methodCall(readMethod, readArg)
             if (returned instanceof Promise) {
