@@ -8,7 +8,8 @@
     "build": "rollup -c",
     "watch": "rollup -c -w -m",
     "start": "tabris serve -a -w",
-    "laun": "source ~/.zshrc && ANDROID_SDK_ROOT=~/Library/Android/sdk tabris run android"
+    "run:android": "source ~/.zshrc && ANDROID_SDK_ROOT=~/Library/Android/sdk tabris run android",
+    "run:ios": "tabris run ios"
   },
   "dependencies": {
     "happy-dom": "^2.11.2",
