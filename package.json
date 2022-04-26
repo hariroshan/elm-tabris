@@ -1,12 +1,14 @@
 {
   "main": "dist",
+  "name": "example-tabris",
   "private": true,
   "scripts": {
     "test": "npm run build && npm run lint",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "build": "rollup -c",
     "watch": "rollup -c -w -m",
-    "start": "tabris serve -a -w"
+    "start": "tabris serve -a -w",
+    "laun": "source ~/.zshrc && ANDROID_SDK_ROOT=~/Library/Android/sdk tabris run android"
   },
   "dependencies": {
     "happy-dom": "^2.11.2",
@@ -15,7 +17,7 @@
     "vm-shim": "0.0.6"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.2.5",
+    "@rollup/plugin-typescript": "^8.3.2",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "buffer": "^6.0.3",
@@ -23,9 +25,10 @@
     "eslint": "^7.11.0",
     "eslint-plugin-react": "^7.21.4",
     "node-elm-compiler": "^5.0.5",
-    "rollup": "^2.56.3",
+    "rollup": "^2.70.2",
     "rollup-pluginutils": "^2.8.2",
     "tabris-cli": "^3.8.0",
-    "typescript": "~3.8.3"
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.3"
   }
 }

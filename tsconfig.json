@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "module": "esnext",
-    "rootDir": "./src/",
     "target": "es6",
     "outDir": "./dist/",
     "lib": [
@@ -17,7 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowJs": true,
-    "typeRoots": ["node_modules/@types"]
+    "sourceMap": true
   },
   "include": [
     "./src/**/*.ts",

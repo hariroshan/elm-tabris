@@ -15,7 +15,8 @@ import {
     withMountAndRender,
     withUnmount,
 } from './mixins'
-import Blob from '../node_modules/happy-dom/lib/file/Blob';
+import { Blob } from 'tabris';
+// import Blob from '../node_modules/happy-dom/lib/file/Blob';
 
 const allModsValue = Object.values(allMods)
 const allElementsValue = Object.values(allElements)

@@ -10,10 +10,11 @@ module Tabris.App exposing
     , methodRegisterFont
     , methodReload
     , methodShare
+    , readDebugBuild
     , readId
     , readIdleTimeoutEnabled
     , tagName
-    , view
+    , view, readVersionCode, readVersion
     )
 
 import Array exposing (Array)
@@ -111,6 +112,21 @@ readId =
 readIdleTimeoutEnabled : ( String, String )
 readIdleTimeoutEnabled =
     ( tagName, idleTimeoutEnabledProp )
+
+
+readDebugBuild : ( String, String )
+readDebugBuild =
+    ( tagName, debugBuild )
+
+
+readVersion : ( String, String )
+readVersion =
+    ( tagName, version )
+
+
+readVersionCode : ( String, String )
+readVersionCode =
+    ( tagName, versionCode )
 
 
 methodLaunchUrl : String -> ( String, String, Array E.Value )
