@@ -1,6 +1,6 @@
 {
   "main": "dist",
-  "name": "example-tabris",
+  "name": "elm-tabris",
   "private": true,
   "scripts": {
     "test": "npm run build && npm run lint",
